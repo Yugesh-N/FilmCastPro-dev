@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star, Users, Camera, Award, ArrowRight, Facebook, Twitter, Instagram, Linkedin, MapPin, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-
+import '../HomePage.css';
 interface HomePageProps {
   onPageChange: (page: string) => void;
 }
@@ -38,6 +38,64 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
 
   return (
     <div className="min-h-screen bg-gray-900">
+      
+<div id="videoCarousel" className="carousel slide mx-auto my-5" data-bs-ride="carousel" data-bs-interval="3000" style={{ maxWidth: "900px" }}>
+   <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-4">
+            What’s New in Film World
+    </h2>
+     <p className="text-gray-400 text-center mb-12 text-lg">
+           Fresh Updates, Hot Teasers & Breaking News
+          </p>
+  <div className="carousel-indicators">
+    <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="0" className="active"  aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="1"  aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="2"  aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="3"  aria-label="Slide 4"></button>
+  </div>
+
+  <div className="carousel-inner rounded-4 shadow-lg overflow-hidden">
+    <div className="carousel-item active videoplayer">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/-yXCPQGrMIc?si=BHFCMoMX0qkAryGN&autoplay=1&mute=1" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+      <div className="carousel-caption d-none d-md-block">
+      <h5>New Teaser</h5>
+      <p>Watch the latest official trailers and sneak peeks of upcoming blockbusters.</p>
+    </div>
+    </div>
+
+    <div className="carousel-item">
+      <img src="https://images.pexels.com/photos/3920847/pexels-photo-3920847.jpeg" className="d-block w-100" alt="..."/>
+      <div className="carousel-caption d-none d-md-block">
+      <h5>Movie Updates</h5>
+      <p>Stay up-to-date with behind-the-scenes exclusives and release date announcements.</p>
+    </div>
+    </div>
+
+    <div className="carousel-item">
+      <img src="https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg" className="d-block w-100" alt="..."/>
+      <div className="carousel-caption d-none d-md-block">
+      <h5>Film News</h5>
+      <p>Get the inside scoop on industry events, celebrity interviews, and breaking headlines.</p>
+    </div>
+    </div>
+
+    <div className="carousel-item">
+      <img src="https://images.pexels.com/photos/3945317/pexels-photo-3945317.jpeg" className="d-block w-100" alt="..."/>
+       <div className="carousel-caption d-none d-md-block">
+      <h5>Offers</h5>
+      <p>Discover exclusive deals and discounts on movie tickets and streaming services.</p>
+    </div>
+    </div>
+  </div>
+
+<button className="carousel-control-prev" type="button" data-bs-target="#videoCarousel" data-bs-slide="prev">
+  <span className="carousel-control-prev-icon"></span>
+</button>
+<button className="carousel-control-next" type="button" data-bs-target="#videoCarousel" data-bs-slide="next">
+  <span className="carousel-control-next-icon"></span>
+</button>
+</div>
+
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-20 overflow-hidden">
         <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -49,6 +107,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             backgroundPosition: 'center'
           }}
         ></div>
+
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
@@ -89,7 +148,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
           )}
         </div>
       </section>
-
       {/* Role Categories */}
       <section className="py-16 bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

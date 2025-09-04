@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Film, Menu, X, User, Search } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-
 interface HeaderProps {
-  currentPage: string;
-  onPageChange: (page: string) => void;
+currentPage: string;
+onPageChange: (page: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => {
@@ -15,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
     { id: 'home', label: 'Home' },
     { id: 'browse', label: 'Browse Talent' },
     { id: 'pricing', label: 'Pricing' },
-    { id: 'about', label: 'About' }
+    { id: 'about', label: 'About' },
   ];
 
   return (
@@ -76,6 +75,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors"
                 >
                   Sign Out
+                </button>
+                <button
+                  onClick={() => {
+                    onPageChange('profile');
+                  }}
+                  className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors"
+                >
+                  <i className="fa-regular fa-user"></i>
                 </button>
               </>
             ) : (
@@ -149,6 +156,16 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                     >
                       Sign Out
                     </button>
+                    
+                  <button
+                  onClick={() => {
+                    onPageChange('profile');
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-300                 hover:text-white hover:bg-gray-800 transition-colors flex items-center justify-start"
+                  >
+                      Profile
+                  </button>
                   </>
                 ) : (
                   <>

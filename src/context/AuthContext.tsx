@@ -8,7 +8,15 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   signIn: (email: string, password: string) => Promise<{ error?: string }>
-  signUp: (email: string, password: string) => Promise<{ error?: string }>
+  signUp: (formData: {
+    email: string;
+    password: string;
+    name: string;
+    bio: string;
+    location: string;
+    plan: string;
+    role: string;
+  }) => Promise<{ error?: string }>
   signOut: () => Promise<void>
   signInWithGoogle: () => Promise<{ error?: string }>
 }
@@ -40,14 +48,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data:{user}, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
+    if(user?.id){ localStorage.setItem("user_id", user.id);
+};
     return {};
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
+  const signUp = async (formData: {
+      email: string;
+      password: string;
+      name: string;
+      bio: string;
+      location: string;
+      plan: string;
+      role: string;
+    }) => {
+    const { data,error } = await supabase.auth.signUp({ 
+      email:formData.email, 
+      password: formData.password 
+    });
     if (error) return { error: error.message };
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password
+    });
+    if (signInError) return { error: signInError.message };
+       const userId = signInData.user?.id;
+      await supabase.from("profiles").insert([
+      {
+        user_id: userId,
+        name: formData.name,
+        bio: formData.bio,
+        location: formData.location,
+        plan: formData.plan,
+        role: formData.role
+      }
+    ]);
     return {};
   };
 

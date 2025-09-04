@@ -38,9 +38,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onPageChange }) => {
       setError('Passwords do not match');
       return;
     }
-    const result = await signUp(formData.email, formData.password);
+    const result = await signUp(formData);
     if (result.error) {
-      setError(result.error);
+      if(result.error.includes("User already registered")){
+        setError("Email is already in use. Please try another one.");
+      }
+      else{
+        setError(result.error);
+      }
       return;
     }
     onPageChange('dashboard');

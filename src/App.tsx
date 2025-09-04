@@ -7,6 +7,7 @@ import { LoginPage } from './components/LoginPage';
 import { BrowsePage } from './components/BrowsePage';
 import { AboutPage } from './components/AboutPage';
 import { DashboardPage } from './components/DashboardPage';
+import { UserProfile } from './components/UserProfile';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -29,6 +30,8 @@ function App() {
         return <AboutPage onPageChange={setCurrentPage} />;
       case 'dashboard':
         return <DashboardPage onPageChange={setCurrentPage} />;
+      case 'profile':                         
+        return <UserProfile onPageChange={setCurrentPage} />;
       default:
         return <HomePage onPageChange={setCurrentPage} />;
     }
