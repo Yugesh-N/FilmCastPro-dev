@@ -2,27 +2,64 @@ import React, { useEffect, useState } from 'react';
 import { Search, Filter, MapPin, Star, Eye } from 'lucide-react';
 import { filmRoles } from '../data/pricing';
 import { supabase } from '../lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
-interface BrowsePageProps {
-  onPageChange: (page: string) => void;
+
+type Experience = {
+  company: string;
+  role: string;
+  duration: string;
+  description: string;
+};
+interface Profile {  
+  id: string | null; 
+  name: string | null;            
+  bio: string | null;             
+  location: string | null;       
+  plan: 'free' | 'silver' | 'gold' | string | null; 
+  role: string | null;
+  coverPhoto: string | null;     
+  profilePhoto: string | null; 
+  experience : Experience[] | null 
+  rating : number |  null;  
+  signedProfilePhoto : string | null
 }
 
 
 
-
-
-export const BrowsePage: React.FC<BrowsePageProps> = ({ onPageChange }) => {
-  const [mockProfiles,setmockProfiles] = useState<any[]>([]);
+export const BrowsePage: React.FC = () => {
+  const navigate = useNavigate();
+  const [mockProfiles,setmockProfiles] = useState<Profile[] | null>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  type plan = 'free' | 'silver' | 'gold';
 
-  const filteredProfiles = mockProfiles.filter(profile => {
-    const matchesSearch = profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         profile.bio.toLowerCase().includes(searchTerm.toLowerCase());
+const order: Record<plan, number> = {
+  free: 1,
+  silver: 2,
+  gold: 3
+};
+
+  const getSignedURL=async(path:string | null)=>{
+    if(!path){
+      return null
+    }
+      const { data, error } = await supabase.storage.from('profile-photos').createSignedUrl(path,3600);
+
+    if(error){
+      console.log(error);
+      return null;
+    }
+    return data?.signedUrl ?? null;
+  } 
+
+  const filteredProfiles = mockProfiles?.filter(profile => {
+    const matchesSearch = profile.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         profile.bio?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = !selectedRole || profile.role === selectedRole;
-    const matchesLocation = !selectedLocation || profile.location.toLowerCase().includes(selectedLocation.toLowerCase());
+    const matchesLocation = !selectedLocation || profile.location?.toLowerCase().includes(selectedLocation.toLowerCase());
     
     return matchesSearch && matchesRole && matchesLocation;
   });
@@ -36,11 +73,22 @@ export const BrowsePage: React.FC<BrowsePageProps> = ({ onPageChange }) => {
   };
   const getUserData = async()=>{
   const {data,error} = await supabase.from('profiles').select("*");
-  setmockProfiles(data ?? []);
   if(error){
     console.log(error);
   };
+  const profilesArray: Profile[] = data ?? [];
+  if(profilesArray){
+    profilesArray.sort((a, b) => order[b.plan as plan] - order[a.plan as plan]);
+  }
+  const profileswithSignedUrls: Profile[] = await Promise.all(
+    profilesArray.map(async(profile:Profile)=>{
+      const signedPhotoURL = await getSignedURL(profile.profilePhoto);
+      return {...profile, signedProfilePhoto:signedPhotoURL}
+    })
+  );
+  setmockProfiles(profileswithSignedUrls);
 
+  
 }
   useEffect(()=>{
     getUserData();
@@ -83,7 +131,7 @@ export const BrowsePage: React.FC<BrowsePageProps> = ({ onPageChange }) => {
               <span>Filters</span>
             </button>
             <span className="text-gray-400 text-sm">
-              {filteredProfiles.length} professionals found
+              {filteredProfiles?.length} professionals found
             </span>
           </div>
 
@@ -122,22 +170,37 @@ export const BrowsePage: React.FC<BrowsePageProps> = ({ onPageChange }) => {
         </div>
 
         {/* Results Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProfiles.map((profile) => (
+        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredProfiles?.map((profile) => (
             <div
               key={profile.id}
               className="bg-gray-800 rounded-xl overflow-hidden hover:bg-gray-750 transition-all transform hover:scale-105 cursor-pointer"
             >
-              <div className="relative">
+              {/* <div className="relative">
                 <img
-                  src={profile.image}
-                  alt={profile.name}
-                  className="w-full h-48 object-cover"
+                  src={profile.profilePhoto ?? ""}
+                  alt={profile.name ?? ""}
+                  className="w-full h-48 object-contain bg-gray-200 rounded"
                 />
-                <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-semibold ${getPlanBadgeColor(profile.plan)}`}>
-                  {profile.plan.toUpperCase()}
+                <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-semibold ${getPlanBadgeColor(profile.plan ?? "")}`}>
+                  {profile.plan?.toUpperCase()}
                 </div>
-              </div>
+              </div> */}
+            <div className="relative w-full aspect-[16/9] bg-gray-200 rounded-t-lg overflow-hidden">
+  <img
+    src={profile.signedProfilePhoto ?? ""}
+    alt={profile.name ?? ""}
+    className="w-full h-full object-cover"
+  />
+  <div
+    className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-semibold ${getPlanBadgeColor(
+      profile.plan ?? ""
+    )}`}
+  >
+    {profile.plan?.toUpperCase()}
+  </div>
+</div>
+
               
               <div className="p-6">
                 <div className="flex items-start justify-between mb-3">
@@ -165,9 +228,11 @@ export const BrowsePage: React.FC<BrowsePageProps> = ({ onPageChange }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-1 text-gray-400">
                     <Eye className="h-4 w-4" />
-                    <span className="text-sm">{profile.projects} projects</span>
+                    <span className="text-sm">{profile.experience?.length} projects</span>
                   </div>
-                  <button className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-yellow-300 transition-colors">
+                  <button className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-yellow-300 transition-colors" onClick={()=>{
+                    navigate(`/profile/${profile.id}`);
+                  }} >
                     View Profile
                   </button>
                 </div>
@@ -177,7 +242,7 @@ export const BrowsePage: React.FC<BrowsePageProps> = ({ onPageChange }) => {
         </div>
 
         {/* No Results */}
-        {filteredProfiles.length === 0 && (
+        {filteredProfiles?.length === 0 && (
           <div className="text-center py-16">
             <div className="text-gray-400 mb-4">
               <Search className="h-16 w-16 mx-auto mb-4 opacity-50" />

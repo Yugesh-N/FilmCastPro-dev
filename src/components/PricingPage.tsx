@@ -1,12 +1,11 @@
 import React from 'react';
 import { Check, Star } from 'lucide-react';
 import { pricingTiers } from '../data/pricing';
+import { useNavigate } from 'react-router-dom';
 
-interface PricingPageProps {
-  onPageChange: (page: string) => void;
-}
 
-export const PricingPage: React.FC<PricingPageProps> = ({ onPageChange }) => {
+export const PricingPage: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-900 py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,7 +46,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onPageChange }) => {
                 </h3>
                 <div className="mb-4">
                   <span className="text-5xl font-bold text-yellow-400">
-                    ${tier.price}
+                    ₹{tier.price}
                   </span>
                   {tier.price > 0 && (
                     <span className="text-gray-400 text-lg">/month</span>
@@ -70,7 +69,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onPageChange }) => {
               </ul>
 
               <button
-                onClick={() => onPageChange('register')}
+                onClick={() => navigate('register')}
                 className={`w-full py-3 px-6 rounded-lg font-semibold transition-all ${
                   tier.featured
                     ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'

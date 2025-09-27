@@ -2,20 +2,20 @@ import React, { useEffect, useState } from "react";
 import "./UserProfile.css";
 import { supabase } from "../lib/supabaseClient";
 
-type Experience = {
+export type Experience = {
   company: string;
   role: string;
   duration: string;
   description: string;
 };
 
-type Education = {
+export type Education = {
   institute: string;
   course: string;
   duration: string;
   description: string;
 };
-type skills = string[]
+export type skills = string[];
 
 
 
@@ -24,19 +24,20 @@ type skills = string[]
   role: string;
   location: string;
   bio: string;
-  coverPhoto: string;
-  profilePhoto: string;
+  coverPhoto: string |null;
+  profilePhoto: string | null;
   experience: Experience[];
   skills: skills[];
   education: Education[];
   plan: string;
+  email:string;
+  gender:string;
+  phone:string;
+  dob:string;
 };
 
-interface ProfileProps {
-  onPageChange: (page: string) => void;
-}
 
-export const UserProfile: React.FC<ProfileProps> = ({ onPageChange }) => {
+export const UserProfile: React.FC = () => {
   const [ProfileData, setProfileData] = useState<ProfileData>({
     name: "",
     role: "",
@@ -48,6 +49,10 @@ export const UserProfile: React.FC<ProfileProps> = ({ onPageChange }) => {
     skills: [],
     education: [],
     plan: "",
+    email:"",
+  gender:"",
+  phone:"",
+  dob:"",
   });
   const [UpdateProfileData, setUpdateProfileData] = useState<ProfileData>({
     name: "",
@@ -60,6 +65,10 @@ export const UserProfile: React.FC<ProfileProps> = ({ onPageChange }) => {
     skills: [],
     education: [],
     plan: "",
+    email:"",
+  gender:"",
+  phone:"",
+  dob:""
   });
 
   const [modal, setModal] = useState(false);
@@ -82,7 +91,7 @@ export const UserProfile: React.FC<ProfileProps> = ({ onPageChange }) => {
 
 
 const fetchData = async () => {
-  let loginId = await checkSession();
+  const loginId = await checkSession();
   const userId = loginId?.[0];
 
   if (!userId) {
@@ -133,7 +142,7 @@ const [updaterole, setupdaterole] = useState({
 const updateData = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  let loginId = await checkSession();
+const loginId = await checkSession();
   if (!loginId) {
     console.log("User not logged in!");
     return;
@@ -195,7 +204,7 @@ const startEdit = (index: number) => {
   setEditingIndex(index);
 };
 
-const saveEdit = (index: number, updatedData: any) => {
+const saveEdit = (index: number, updatedData: Experience) => {
   const updatedExperiences = [...UpdateProfileData.experience];
   updatedExperiences[index] = updatedData;
 
@@ -264,6 +273,58 @@ const saveNewEducation = () => {
   setNewEducation({ institute: "", course: "", duration: "", description: "" });
 };
 
+const handleProfilePhotoUpload = async (e:React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0]
+  if (!file) return;
+
+  const fileName = `${Date.now()}-${file.name}`;
+
+  const {error} = await supabase.storage
+      .from('profile-photos')
+      .upload(fileName,file,{cacheControl:'3600',upsert:true})
+  
+  if(error){
+    console.log(error.message);
+    return;
+  }
+  const {data} = await supabase.storage.from("profile-photos").getPublicUrl(fileName);
+  if(!data){
+    return null;
+  }
+
+  setUpdateProfileData({
+    ...UpdateProfileData,
+    profilePhoto : fileName
+  })
+};
+
+const handleCoverPhotoUpload = async(e:React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const fileUrl = URL.createObjectURL(file);
+
+  setUpdateProfileData({
+    ...UpdateProfileData,
+    coverPhoto: fileUrl,
+  });
+
+};
+const handleDeleteProfilePhoto = () => {
+  setUpdateProfileData((prevData) => ({
+    ...prevData,
+    profilePhoto: null
+  }));
+};
+
+const handleDeleteCoverPhoto = () => {
+  setUpdateProfileData((prevData) => ({
+    ...prevData,
+    coverPhoto: null, 
+  }));
+};
+
+
 
 
 
@@ -280,7 +341,7 @@ return (
             
           <div className="h-48 w-full">
             <img
-              src={ProfileData.coverPhoto || "https://images.unsplash.com/photo-1503264116251-35a269479413"} 
+              src={ProfileData.coverPhoto || "https://tse1.mm.bing.net/th/id/OIP.Ap7CXl8VCxaeqDKo1uRYTAHaB2?pid=Api&P=0&h=180"} 
               alt="Cover"
               className="w-full h-full object-cover"
             />
@@ -430,6 +491,139 @@ return (
               </div>
 
 <div className="modal-body">
+<div className="position-relative mb-4">
+  <div
+    className="rounded overflow-hidden position-relative"
+    style={{ height: "180px", backgroundColor: "#f0f0f0" }}
+  >
+    {/* Cover Image */}
+    <img
+      src={UpdateProfileData.coverPhoto || "https://tse1.mm.bing.net/th/id/OIP.Ap7CXl8VCxaeqDKo1uRYTAHaB2?pid=Api&P=0&h=180"}
+      alt="Cover"
+      className="w-100 h-100"
+      style={{ objectFit: "cover" }}
+    />
+
+    {/* Upload Cover Photo Button */}
+    <label
+      className="position-absolute top-0 end-0 m-2 btn btn-sm btn-dark"
+      style={{ cursor: "pointer" }}
+    >
+      Change Cover
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => handleCoverPhotoUpload(e)}
+        style={{ display: "none" }}
+      />
+    </label>
+
+    {/* Delete Cover Photo Button */}
+    {UpdateProfileData.coverPhoto && (
+      <button
+        type="button"
+        className="position-absolute top-0 start-0 m-2 bg-danger text-white p-1 rounded-circle border-0"
+        style={{
+          width: "30px",
+          height: "30px",
+          cursor: "pointer",
+        }}
+        onClick={() => handleDeleteCoverPhoto()}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    )}
+  </div>
+
+  <div className="position-absolute start-50 translate-middle">
+    <div
+      className="rounded-circle border border-3 border-white shadow position-relative"
+      style={{
+        width: "80px",
+        height: "80px",
+        overflow: "hidden",
+        backgroundColor: "#e0e0e0",
+      }}
+    >
+      <img
+        src={UpdateProfileData.profilePhoto || "https://tse3.mm.bing.net/th/id/OIP.apRNXJkvlf4bc55gw0dXLQHaHa?pid=Api&P=0&h=180"}
+        alt="Profile"
+        className="w-100 h-100"
+        style={{ objectFit: "cover" }}
+      />
+
+      <label
+        className="position-absolute bottom-2 end-2 
+           bg-black bg-opacity-50 text-white 
+           rounded-circle d-flex align-items-center justify-content-center 
+           cursor-pointer hover:bg-opacity-75 shadow"
+style={{ width: "18px", height: "18px", fontSize: "14px" }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleProfilePhotoUpload(e)}
+          style={{ display: "none" }}
+        />
+      </label>
+
+      {/* Delete Profile Photo Button */}
+      {UpdateProfileData.profilePhoto && (
+        <button
+          type="button"
+          className="position-absolute top-0 end-0 bg-danger text-white p-1 rounded-circle border-0"
+          style={{
+            width: "28px",
+            height: "28px",
+            cursor: "pointer",
+          }}
+          onClick={() => handleDeleteProfilePhoto()}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
+{/* Spacing below the header */}
+<div style={{ height: "40px" }}></div>
+
 
   <div className="mb-3">
     <label htmlFor="name" className="form-label text-dark">

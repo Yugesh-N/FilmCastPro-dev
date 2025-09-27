@@ -3,7 +3,7 @@ import { PricingTier } from '../types';
 export const pricingTiers: PricingTier[] = [
   {
     name: 'free',
-    price: 0,
+    price: 0 ,
     features: [
       'Basic profile creation',
       'Up to 5 portfolio items',
@@ -15,7 +15,7 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     name: 'silver',
-    price: 29,
+    price: 99,
     features: [
       'Enhanced profile features',
       'Up to 25 portfolio items',
@@ -29,7 +29,7 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     name: 'gold',
-    price: 99,
+    price: 299,
     features: [
       'Premium profile with custom branding',
       'Unlimited portfolio items',

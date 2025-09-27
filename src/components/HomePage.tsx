@@ -6,13 +6,12 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../HomePage.css';
-
-interface HomePageProps {
-  onPageChange: (page: string) => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 const videoSlides = [
   {
+    url:"https://www.youtube.com/embed/RBD0yHtwVw4?si=5iP1ec22Uo4s-x7i&autoplay=1&mute=1"
+  },{
     url: "https://www.youtube.com/embed/-yXCPQGrMIc?si=BHFCMoMX0qkAryGN&autoplay=1&mute=1"
   },
   {
@@ -32,7 +31,9 @@ const videoSlides = [
   }
 ];
 
-export const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
+export const HomePage: React.FC = () => {
+  const nagivate = useNavigate();
+
   const { user } = useAuth();
 const [isPaused, setIsPaused] = useState(false); 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -98,7 +99,7 @@ const [isPaused, setIsPaused] = useState(false);
   return (
     <div className="min-h-screen bg-gray-900">
       {/* What's New Section with Video Carousel */}
-      <div className="mx-auto my-8 max-w-4xl">
+      <div className="mx-auto max-w-4xl">
         <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-4">
           What's New in Film World
         </h2>
@@ -116,7 +117,7 @@ const [isPaused, setIsPaused] = useState(false);
               <iframe
                 width="100%"
                 height="100%"
-                src={`${videoSlides[currentIndex].url}&enablejsapi=1`}
+                src={`${videoSlides[currentIndex].url}&enablejsapi=1&rel=0`}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -180,14 +181,14 @@ const [isPaused, setIsPaused] = useState(false);
           {!user ? (
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
-                onClick={() => onPageChange('register')}
+                onClick={() => ('register')}
                 className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105 flex items-center justify-center"
               >
                 Start Your Journey
                 <ArrowRight className="ml-2 h-5 w-5" />
               </button>
               <button 
-                onClick={() => onPageChange('browse')}
+                onClick={() => nagivate('browse')}
                 className="border-2 border-yellow-400 text-yellow-400 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-yellow-400 hover:text-gray-900 transition-all"
               >
                 Browse Talent
@@ -196,7 +197,7 @@ const [isPaused, setIsPaused] = useState(false);
           ) : (
             <div className="flex justify-center">
               <button 
-                onClick={() => onPageChange('browse')}
+                onClick={() => nagivate('browse')}
                 className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105"
               >
                 Browse Talent
@@ -220,7 +221,7 @@ const [isPaused, setIsPaused] = useState(false);
               <div 
                 key={index}
                 className="bg-gray-700 hover:bg-gray-600 p-4 rounded-lg text-center transition-all cursor-pointer transform hover:scale-105"
-                onClick={() => onPageChange('register')}
+                onClick={() => nagivate('register')}
               >
                 <span className="text-white font-medium">{role}</span>
               </div>
@@ -280,7 +281,7 @@ const [isPaused, setIsPaused] = useState(false);
               Join thousands of film professionals who are already building their careers with FilmCast Pro.
             </p>
             <button 
-              onClick={() => onPageChange('register')}
+              onClick={() => nagivate('register')}
               className="bg-gray-900 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-800 transition-all transform hover:scale-105"
             >
               Create Your Profile Today

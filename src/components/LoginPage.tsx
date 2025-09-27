@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Film } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabaseClient';
-
-interface LoginPageProps {
-  onPageChange: (page: string) => void;
-}
-
-export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
+import { useNavigate } from 'react-router-dom';
+export const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const { signIn, signInWithGoogle } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -32,7 +28,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
       setError(result.error);
       return;
     }
-    onPageChange('dashboard');
+    navigate('dashboard');
   };
 
 
@@ -113,7 +109,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onPageChange }) => {
             <p className="text-gray-400">
               Don't have an account?{' '}
               <button
-                onClick={() => onPageChange('register')}
+                onClick={() => navigate('register')}
                 className="text-yellow-400 hover:text-yellow-300 font-medium"
               >
                 Create Account

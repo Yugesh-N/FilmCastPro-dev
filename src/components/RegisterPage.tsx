@@ -3,12 +3,9 @@ import { User, Mail, Lock, Camera, MapPin } from 'lucide-react';
 import { filmRoles } from '../data/pricing';
 import { FilmRole, PricingPlan } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { ProfileData } from './UserProfile';
-interface RegisterPageProps {
-  onPageChange: (page: string) => void;
-}
-
-export const RegisterPage: React.FC<RegisterPageProps> = ({ onPageChange }) => {
+import { useNavigate } from 'react-router-dom';
+export const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
   const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
@@ -49,7 +46,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onPageChange }) => {
       return;
     }
     console.log(result);
-    onPageChange('dashboard');
+    navigate('dashboard');
   };
 
   const nextStep = () => {
@@ -229,8 +226,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onPageChange }) => {
                           </div>
                           <div className="text-2xl font-bold text-yellow-400">
                             {plan === 'free' && 'Free'}
-                            {plan === 'silver' && '$29/mo'}
-                            {plan === 'gold' && '$99/mo'}
+                            {plan === 'silver' && '₹99/mo'}
+                            {plan === 'gold' && '₹299/mo'}
                           </div>
                         </div>
                       </div>
@@ -276,7 +273,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onPageChange }) => {
             <p className="text-gray-400">
               Already have an account?{' '}
               <button
-                onClick={() => onPageChange('login')}
+                onClick={() => navigate('login')}
                 className="text-yellow-400 hover:text-yellow-300 font-medium"
               >
                 Sign In

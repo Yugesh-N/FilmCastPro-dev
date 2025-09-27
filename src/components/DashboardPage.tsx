@@ -1,18 +1,17 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-interface DashboardPageProps {
-  onPageChange: (page: string) => void;
-}
 
-export const DashboardPage: React.FC<DashboardPageProps> = ({ onPageChange }) => {
+export const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
   useEffect(() => {
     if (!user) {
-      onPageChange('login');
+      navigate('login');
     }
-  }, [user, onPageChange]);
+  }, [user, navigate]);
 
   if (!user) {
     return null;
@@ -26,13 +25,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onPageChange }) =>
           <p className="text-gray-400 mb-8">You're signed in. From here you can browse talent, update your profile, or explore plans.</p>
           <div className="flex flex-wrap gap-4">
             <button
-              onClick={() => onPageChange('browse')}
+              onClick={() => navigate('browse')}
               className="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
             >
               Browse Talent
             </button>
             <button
-              onClick={() => onPageChange('pricing')}
+              onClick={() => navigate('pricing')}
               className="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors"
             >
               View Plans
@@ -40,14 +39,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onPageChange }) =>
             <button
               onClick={async () => {
                 await signOut();
-                onPageChange('home');
+                navigate('home');
               }}
               className="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors"
             >
               Sign Out
             </button>
             <button
-              onClick={() => onPageChange('home')}
+              onClick={() => navigate('home')}
               className="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors"
             >
               Back to Home

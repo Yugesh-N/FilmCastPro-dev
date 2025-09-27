@@ -1,21 +1,49 @@
-import React, { useState } from 'react';
-import { Film, Menu, X, User, Search } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Film, Menu, X, Search } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-interface HeaderProps {
-currentPage: string;
-onPageChange: (page: string) => void;
+import { supabase } from '../lib/supabaseClient';
+import { useNavigate, useLocation } from 'react-router-dom';
+interface Profile {
+  user_id: string;
+  plan: 'free' | 'silver' | 'gold';
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => {
+
+export const Header: React.FC = () => {
+  const nagivate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+ 
+const getData = async () => {
+  if (!user) return; 
 
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', user.id).single();
+
+    console.log(data);
+
+  if (error) {
+    console.error('Error fetching user data:', error);
+  } else {
+    console.log('User data:', data);
+    setProfile(data);
+  }
+};
   const navItems = [
-    { id: 'home', label: 'Home' },
+    { id: '/', label: 'Home' },
     { id: 'browse', label: 'Browse Talent' },
     { id: 'pricing', label: 'Pricing' },
     { id: 'about', label: 'About' },
   ];
+useEffect(() => {
+  if (user) {
+    getData();
+  }
+}, [user]);
 
   return (
     <header className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
@@ -24,20 +52,19 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
           {/* Logo */}
           <div 
             className="flex items-center space-x-2 cursor-pointer"
-            onClick={() => onPageChange('home')}
+            onClick={() => nagivate('/')}
           >
             <Film className="h-8 w-8 text-yellow-400" />
             <span className="text-xl font-bold text-white">FilmCast Pro</span>
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => onPageChange(item.id)}
+                onClick={() => nagivate(item.id)}
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  currentPage === item.id
+                  location.pathname === item.id
                     ? 'text-yellow-400 border-b-2 border-yellow-400'
                     : 'text-gray-300 hover:text-white'
                 }`}
@@ -47,10 +74,9 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
             ))}
           </nav>
 
-          {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <button 
-              onClick={() => onPageChange('search')}
+              onClick={() => nagivate('search')}
               className="p-2 text-gray-300 hover:text-white transition-colors"
             >
               <Search className="h-5 w-5" />
@@ -58,9 +84,9 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
             {user ? (
               <>
                 <button
-                  onClick={() => onPageChange('dashboard')}
+                  onClick={() => nagivate('dashboard')}
                   className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    currentPage === 'dashboard'
+                    location.pathname === 'dashboard'
                       ? 'text-yellow-400 border-b-2 border-yellow-400'
                       : 'text-gray-300 hover:text-white'
                   }`}
@@ -70,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                 <button
                   onClick={async () => {
                     await signOut();
-                    onPageChange('home');
+                    nagivate('/');
                   }}
                   className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors"
                 >
@@ -78,23 +104,33 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                 </button>
                 <button
                   onClick={() => {
-                    onPageChange('profile');
+                    nagivate('userprofile');
                   }}
                   className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors"
                 >
                   <i className="fa-regular fa-user"></i>
                 </button>
+                {profile && profile.plan !== 'gold' && (
+                <button
+                  onClick={() => {
+                    nagivate('pricing');
+                  }}
+                  className="px-4 py-2 rounded-lg font-semibold text-gray-900 transition-all
+                    bg-yellow-400 hover:bg-yellow-300 shadow-lg animate-pulse border-2 border-yellow-600">
+                  Upgrade
+                </button>
+                )}
               </>
             ) : (
               <>
                 <button 
-                  onClick={() => onPageChange('login')}
+                  onClick={() => nagivate('login')}
                   className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors"
                 >
                   Sign In
                 </button>
                 <button 
-                  onClick={() => onPageChange('register')}
+                  onClick={() => nagivate('register')}
                   className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-300 transition-colors"
                 >
                   Get Started
@@ -122,11 +158,11 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                 <button
                   key={item.id}
                   onClick={() => {
-                    onPageChange(item.id);
+                    nagivate(item.id);
                     setIsMenuOpen(false);
                   }}
                   className={`px-3 py-2 text-sm font-medium text-left transition-colors ${
-                    currentPage === item.id
+                    location.pathname === item.id
                       ? 'text-yellow-400 bg-gray-800'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
                   }`}
@@ -139,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                   <>
                     <button
                       onClick={() => {
-                        onPageChange('dashboard');
+                        nagivate('dashboard');
                         setIsMenuOpen(false);
                       }}
                       className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
@@ -150,7 +186,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                       onClick={async () => {
                         await signOut();
                         setIsMenuOpen(false);
-                        onPageChange('home');
+                        nagivate('/');
                       }}
                       className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors mt-2"
                     >
@@ -159,19 +195,28 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                     
                   <button
                   onClick={() => {
-                    onPageChange('profile');
+                    nagivate('userprofile');
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-300                 hover:text-white hover:bg-gray-800 transition-colors flex items-center justify-start"
+                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-300                 hover:text-white hover:bg-gray-800 transition-colors mt -2 flex items-center justify-start"
                   >
                       Profile
                   </button>
+                  <button
+                    onClick={() => {
+                      nagivate('pricing');
+                    }}
+                    className="px-4 py-2 rounded-lg font-semibold text-gray-900 transition-all
+                      bg-yellow-400 hover:bg-yellow-300 shadow-lg mt-2">
+                    Upgrade
+                  </button>
                   </>
+
                 ) : (
                   <>
                     <button 
                       onClick={() => {
-                        onPageChange('login');
+                        nagivate('login');
                         setIsMenuOpen(false);
                       }}
                       className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
@@ -180,7 +225,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange }) => 
                     </button>
                     <button 
                       onClick={() => {
-                        onPageChange('register');
+                        nagivate('register');
                         setIsMenuOpen(false);
                       }}
                       className="block w-full text-left px-3 py-2 text-sm font-medium bg-yellow-400 text-gray-900 hover:bg-yellow-300 transition-colors rounded-lg mt-2"

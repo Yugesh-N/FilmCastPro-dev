@@ -1,12 +1,10 @@
 import React from 'react';
 import { Users, Target, Award, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-interface AboutPageProps {
-  onPageChange: (page: string) => void;
-}
-
-export const AboutPage: React.FC<AboutPageProps> = ({ onPageChange }) => {
+export const AboutPage: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const values = [
     {
@@ -92,7 +90,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onPageChange }) => {
               </p>
               {!user && (
                 <button
-                  onClick={() => onPageChange('register')}
+                  onClick={() => navigate('register')}
                   className="bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
                 >
                   Join Our Community
@@ -203,7 +201,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onPageChange }) => {
           </p>
           {!user && (
             <button
-              onClick={() => onPageChange('register')}
+              onClick={() => navigate('register')}
               className="bg-gray-900 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-800 transition-all transform hover:scale-105"
             >
               Get Started Now

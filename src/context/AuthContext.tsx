@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       role: string;
     }) => {
       console.log(formData);
-    const { data,error } = await supabase.auth.signUp({ 
+    const {error } = await supabase.auth.signUp({ 
       email:formData.email, 
       password: formData.password 
     });
@@ -84,7 +84,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         bio: formData.bio,
         location: formData.location,
         plan: formData.plan,
-        role: formData.role
+        role: formData.role,
+        email:formData.email
       }
     ]);
     return {};
